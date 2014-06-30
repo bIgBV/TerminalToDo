@@ -1,13 +1,8 @@
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 class TerminalToDo {
-  private static final String FILE_NAME = "TODO_LIST.txt";
+  File file = new File("/home/bigb/Programming/Java/TerminalToDo/list.txt");
   String item; 
 
   TerminalToDo(){
@@ -20,10 +15,9 @@ class TerminalToDo {
     }
     else{
       try{
-      	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_NAME, true)));
+      	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
       	out.println(item);
-        out.close();      
-	System.out.println("New item added to the list.");
+        out.close();
       }
       catch(IOException e){
 	e.printStackTrace();
@@ -33,13 +27,14 @@ class TerminalToDo {
 
   public void listItems(){
     try{
-      Scanner scn = new Scanner(new FileReader(FILE_NAME));
-      while(scn.hasNext()){
-        System.out.println(scn.next());
-      }
-    }
+     BufferedReader read = new BufferedReader( new FileReader("/home/bigb/Programming/Java/TerminalToDo/list.txt"));
+     String line=null;
+     while((line = read.readLine()) != null){
+       System.out.println(line);
+     }
+   }
     catch(IOException e){
-      e.printStackTrace();
+     e.printStackTrace();
     }
   }
 
@@ -52,17 +47,17 @@ class TerminalToDo {
 
     while(true){
       System.out.print("> ");
-      if(scn.nextLine() == "add"){
-	System.out.println("New item: ");
-	String text = scn.nextLine();
-	term.addItem(text);		
+      if(scn.nextLine().equals("add")){
+	     System.out.println("New item: ");
+	     String text = scn.nextLine();
+	     term.addItem(text);		
       }
       else if(scn.nextLine() == "show"){
-	System.out.println(">Listing all present items:");
-	term.listItems();
+	     System.out.println(">Listing all present items:");
+	     term.listItems();
       }
       else{
-	break;
+	     break;
       }
     }    
   }

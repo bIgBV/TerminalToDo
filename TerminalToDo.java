@@ -47,16 +47,17 @@ class TerminalToDo {
 
     while(true){
       System.out.print("> ");
-      if(scn.nextLine().equals("add")){
+      String input = scn.nextLine();
+      if(input.equals("add")){
 	     System.out.println("New item: ");
 	     String text = scn.nextLine();
 	     term.addItem(text);		
       }
-      else if(scn.nextLine() == "show"){
+      else if(input.equals("show")){
 	     System.out.println(">Listing all present items:");
 	     term.listItems();
       }
-      else{
+      else if(input.equals("exit")){
 	     break;
       }
     }    

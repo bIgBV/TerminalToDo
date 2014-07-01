@@ -4,7 +4,6 @@ import java.util.*;
 /**
  * Main class for the application. 
  *
- * @author bIgBV
  * @version 0.1.1
  */
 public class TerminalToDo {
@@ -45,7 +44,6 @@ public class TerminalToDo {
    * method of the {@link PrintWriter} class. Uses a {@link BufferedReader} to maintain 
    * a buffer for the input from the user.
    *
-   * @author bIgBV 
    * @param item a String containing the user input.
    * @param file a file object containing the file to be written to.
    * @throws IOException if an inpor or an output exception occured
@@ -71,11 +69,13 @@ public class TerminalToDo {
    * Lists all the items present in the list. Takes in the input file and lists all the
    * items present in it by reading each line.
    *
-   * @author bIgBV 
    * @param file a file object containing the file to read from.
-   * @throws IOException if an inpor or an output exception occured
+   * @throws IOException if an input or an output exception occured
    */ 
   public void listItems(TerminalToDo term){
+
+    // This uses a generic collection to avoid a ClassCastException when extracting list 
+    // items.
     Iterator<String> listIterator = term.todoList.iterator();
     int itemNumer = 1;
     while(listIterator.hasNext()){
@@ -83,7 +83,16 @@ public class TerminalToDo {
       itemNumer++;
     }   
   }
-
+  
+  /**
+   * Deletes an item from the list and updates the file. It deletes the item from the list
+   * using the <code>remove(int index)</code> method of {@link LinkedList} and then 
+   * iterates over the list and overwrites the file with the new list.
+   *
+   * @param term the class object containing the list.
+   * @param index the index of the list item to be removed.
+   * @throws IOException if an input or output exception occurs.
+   */
   public String deleteItem(TerminalToDo term, int index){
     String removedItem = "";
     if (index < 0){
@@ -97,6 +106,7 @@ public class TerminalToDo {
 	 while(listIterator.hasNext()){
            out.println(listIterator.next());
         }
+	out.close();
       }
       catch(IOException e){
 	e.printStackTrace();
@@ -117,7 +127,6 @@ public class TerminalToDo {
     TerminalToDo term = new TerminalToDo();
     Scanner scn = new Scanner(System.in);
     File file = new File(term.FILE_NAME);
-    
          
     /*
      * Creates an infinite loop for the user to input commands. Uses the 'scn' object to 
@@ -126,7 +135,15 @@ public class TerminalToDo {
      */
     while(true){
       System.out.print("> ");
-      String input = scn.nextLine();
+
+      /*
+       * Storing the command entered by the user in a variable 'input'. Before it is assigned
+       * to it, all the whitespaces are stripped from the input using regex replaceAll() 
+       * method.
+       */
+      String input = scn.nextLine().replaceAll("\\s+","");
+
+      // This part of the main method cheks for user input.
       if(input.equals("help")){
 	System.out.println("Welcome to TerminalToDo, the command line to-do list.\nYou have three options:\n");
 	System.out.format("%10s%s","add:", " This command let's you add a new item to the list.\n");
@@ -135,33 +152,34 @@ public class TerminalToDo {
 	System.out.format("%10s%s","exit:"," This command exits the application.\n");
       }
       else if(input.equals("add")){
-	System.out.println("New item: ");
+	System.out.print("New item: ");
 	String text = scn.nextLine();
 	term.addItem(text, file, term);
-	System.out.println(">New item has been added...");
+	System.out.println("New item has been added...");
 	term.listItems(term);	
       }
 
       else if(input.equals("show")){
-	System.out.println("> Listing all present items:");
+	System.out.println("Listing all present items:");
+	term.listItems(term);
+      }
+      else if(input.equals("delete")){
+	System.out.println("Listing present items in list...");
+	term.listItems(term);
+	System.out.println("Please specify which item you want to remove: ");
+	int index = Integer.parseInt(scn.next()) - 1;
+	String removedItem = term.deleteItem(term, index);
+	System.out.println("The removed item is: ");
+	System.out.println(removedItem);
+	System.out.println("The new list items are: ");
 	term.listItems(term);
       }
       else if(input.equals("exit")){
+	System.out.println("Exiting...")
 	break;
       }
-      else if(input.equals("delete")){
-	System.out.println("> Listing present items in list...");
-	term.listItems(term);
-	System.out.println("> Please specify which item you want to remove: ");
-	int index = Integer.parseInt(scn.next()) - 1;
-	String removedItem = term.deleteItem(term, index);
-	System.out.println("> The removed item is: ");
-	System.out.println(removedItem);
-	System.out.println("> The new list items are: ");
-	term.listItems(term);
-      }
       else{
-	System.out.println("Please enter a command.");
+	System.out.println("> Please enter a command.");
       }
     }    
   }

@@ -15,7 +15,10 @@ public class TerminalToDo {
   LinkedList<String> todoList = new LinkedList<String>();
   String item; 
 
-
+  /**
+   * Default constructor initializes an empty item and adds the items of 
+   * the specified list to a {@link LinkedList } to perform operations on.
+   */
   TerminalToDo(){
     this.item = "";
     System.out.println(">Loading your list items...");
@@ -76,9 +79,30 @@ public class TerminalToDo {
     Iterator<String> listIterator = term.todoList.iterator();
     int itemNumer = 1;
     while(listIterator.hasNext()){
-      System.out.println(itemNumer + ": " + listIterator.next());
+      System.out.format("%5d%s%s%s",itemNumer , ": " , listIterator.next(),"\n");
       itemNumer++;
     }   
+  }
+
+  public String deleteItem(TerminalToDo term, int index){
+    String removedItem = "";
+    if (index < 0){
+      removedItem = "Please provide the proper list item number.";
+    }
+    else{
+      try{
+         removedItem = term.todoList.remove(index);
+	 PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(term.FILE_NAME)));
+	 Iterator<String> listIterator = term.todoList.iterator();
+	 while(listIterator.hasNext()){
+           out.println(listIterator.next());
+        }
+      }
+      catch(IOException e){
+	e.printStackTrace();
+      }
+    }
+    return removedItem;
   }
 
   public static void main(String args[]){
@@ -105,24 +129,39 @@ public class TerminalToDo {
       String input = scn.nextLine();
       if(input.equals("help")){
 	System.out.println("Welcome to TerminalToDo, the command line to-do list.\nYou have three options:\n");
-	System.out.format("%10s%s","add:", "This command let's you add a new item to the list.\n");
+	System.out.format("%10s%s","add:", " This command let's you add a new item to the list.\n");
 	System.out.format("%10s%s","show:"," This command shows you all the items present in your list.\n");
+	System.out.format("%10s%s","delete:"," This command asks for an index and deletes the particular item at that index.\n");
 	System.out.format("%10s%s","exit:"," This command exits the application.\n");
       }
       else if(input.equals("add")){
-	     System.out.println("New item: ");
-	     String text = scn.nextLine();
-	     term.addItem(text, file, term);		
+	System.out.println("New item: ");
+	String text = scn.nextLine();
+	term.addItem(text, file, term);
+	System.out.println(">New item has been added...");
+	term.listItems(term);	
       }
+
       else if(input.equals("show")){
-	     System.out.println(">Listing all present items:");
-	     term.listItems(term);
+	System.out.println("> Listing all present items:");
+	term.listItems(term);
       }
       else if(input.equals("exit")){
-	     break;
+	break;
+      }
+      else if(input.equals("delete")){
+	System.out.println("> Listing present items in list...");
+	term.listItems(term);
+	System.out.println("> Please specify which item you want to remove: ");
+	int index = Integer.parseInt(scn.next()) - 1;
+	String removedItem = term.deleteItem(term, index);
+	System.out.println("> The removed item is: ");
+	System.out.println(removedItem);
+	System.out.println("> The new list items are: ");
+	term.listItems(term);
       }
       else{
-	System.out.println("Please enter the right command.");
+	System.out.println("Please enter a command.");
       }
     }    
   }

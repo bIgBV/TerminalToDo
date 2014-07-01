@@ -1,5 +1,6 @@
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+
 /**
  * Main class for the application. 
  *
@@ -7,11 +8,33 @@ import java.util.Scanner;
  * @version 0.1.1
  */
 public class TerminalToDo {
-  File file = new File("/home/bigb/Programming/Java/TerminalToDo/list.txt");
+
+  // This variable stores the location for the list file.
+  public static final String FILE_NAME = "../res/list.txt"; 
+
+  LinkedList<String> todoList = new LinkedList<String>();
   String item; 
+
 
   TerminalToDo(){
     this.item = "";
+    System.out.println(">Loading your list items...");
+
+    File file = new File(TerminalToDo.FILE_NAME);
+    LinkedList<String> list = new LinkedList<String>();
+    try{
+      BufferedReader read = new BufferedReader( new FileReader(TerminalToDo.FILE_NAME));
+
+      String line = null;
+      while((line = read.readLine()) != null){
+        list.add(line);
+      }
+
+      this.todoList = list;
+    }
+    catch(IOException e){
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -21,9 +44,10 @@ public class TerminalToDo {
    *
    * @author bIgBV 
    * @param item a String containing the user input.
+   * @param file a file object containing the file to be written to.
    * @throws IOException if an inpor or an output exception occured
    */
-  public void addItem(String item){
+  public void addItem(String item, File file, TerminalToDo term){
     if (item == ""){
       System.out.println("Please enter your list item");
     }
@@ -32,6 +56,7 @@ public class TerminalToDo {
       	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
       	out.println(item);
         out.close();
+	term.todoList.add(item);
       }
       catch(IOException e){
 	e.printStackTrace();
@@ -44,32 +69,32 @@ public class TerminalToDo {
    * items present in it by reading each line.
    *
    * @author bIgBV 
+   * @param file a file object containing the file to read from.
    * @throws IOException if an inpor or an output exception occured
    */ 
-  public void listItems(){
-    try{
-     BufferedReader read = new BufferedReader( new FileReader("/home/bigb/Programming/Java/TerminalToDo/list.txt"));
-     String line=null;
-     while((line = read.readLine()) != null){
-       System.out.println(line);
-     }
-   }
-    catch(IOException e){
-     e.printStackTrace();
-    }
+  public void listItems(TerminalToDo term){
+    Iterator<String> listIterator = term.todoList.iterator();
+    int itemNumer = 1;
+    while(listIterator.hasNext()){
+      System.out.println(itemNumer + ": " + listIterator.next());
+      itemNumer++;
+    }   
   }
 
   public static void main(String args[]){
+
+    System.out.println("TerminalToDo: Commandline based to-do application(v 0.1.1)");
+    System.out.println("Type 'help' to list all commands");
+
     /*
      * Creating the TerminalToDo objects and the Scanner objects. These objects 
      * are used for all opperations.
      */
     TerminalToDo term = new TerminalToDo();
     Scanner scn = new Scanner(System.in);
+    File file = new File(term.FILE_NAME);
     
-    System.out.println("TerminalToDo: Commandline based to-do application(v 0.1.1)");
-    System.out.println("Type 'help' to list all commands");
-     
+         
     /*
      * Creates an infinite loop for the user to input commands. Uses the 'scn' object to 
      * scan user input and check for the right commands. If the correct command is found
@@ -87,11 +112,11 @@ public class TerminalToDo {
       else if(input.equals("add")){
 	     System.out.println("New item: ");
 	     String text = scn.nextLine();
-	     term.addItem(text);		
+	     term.addItem(text, file, term);		
       }
       else if(input.equals("show")){
 	     System.out.println(">Listing all present items:");
-	     term.listItems();
+	     term.listItems(term);
       }
       else if(input.equals("exit")){
 	     break;
@@ -102,4 +127,3 @@ public class TerminalToDo {
     }    
   }
 }
-

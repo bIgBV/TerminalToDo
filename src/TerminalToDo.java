@@ -11,25 +11,32 @@ public class TerminalToDo {
   // This variable stores the location for the list file.
   public static final String FILE_NAME = "../res/list.txt"; 
 
-  LinkedList<String> todoList = new LinkedList<String>();
-  String item; 
+  LinkedList<TerminalToDo> todoList = new LinkedList<TerminalToDo>();
+  String item;
+  int urgency; 
 
   /**
    * Default constructor initializes an empty item and adds the items of 
    * the specified list to a {@link LinkedList } to perform operations on.
    */
-  TerminalToDo(){
-    this.item = "";
+  TerminalToDo(String item, int urgency){
+    this.item = item;
+    this.urgency = urgency;
+  }
+
+  LinkedList ListLoader(){
     System.out.println(">Loading your list items...");
+    int urgency = 0; // Setting default urgency for now.
 
     File file = new File(TerminalToDo.FILE_NAME);
-    LinkedList<String> list = new LinkedList<String>();
+    LinkedList<TerminalToDo> list = new LinkedList<TerminalToDo>();
     try{
       BufferedReader read = new BufferedReader( new FileReader(TerminalToDo.FILE_NAME));
 
       String line = null;
       while((line = read.readLine()) != null){
-        list.add(line);
+        TerminalToDo node = new TerminalToDo(line, urgency);
+        list.add(node);
       }
 
       this.todoList = list;
@@ -37,6 +44,7 @@ public class TerminalToDo {
     catch(IOException e){
       e.printStackTrace();
     }
+    return todoList;
   }
 
   /**
@@ -57,7 +65,9 @@ public class TerminalToDo {
       	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
       	out.println(item);
         out.close();
-	term.todoList.add(item);
+	int urgency = 0;
+	TerminalToDo node = new TerminalToDo(item, urgency);
+	term.todoList.add(node);
       }
       catch(IOException e){
 	e.printStackTrace();
@@ -76,10 +86,11 @@ public class TerminalToDo {
 
     // This uses a generic collection to avoid a ClassCastException when extracting list 
     // items.
-    Iterator<String> listIterator = term.todoList.iterator();
+    Iterator<TerminalToDo> listIterator = term.todoList.iterator();
     int itemNumer = 1;
     while(listIterator.hasNext()){
-      System.out.format("%5d%s%s%s",itemNumer , ": " , listIterator.next(),"\n");
+      TerminalToDo nextNode = listIterator.next();
+      System.out.format("%5d%s%s%s",itemNumer , ": " , nextNode.item,"\n");
       itemNumer++;
     }   
   }
@@ -94,15 +105,17 @@ public class TerminalToDo {
    * @throws IOException if an input or output exception occurs.
    */
   public String deleteItem(TerminalToDo term, int index){
+    TerminalToDo node = new TerminalToDo(term.item, term.urgency);
     String removedItem = "";
     if (index < 0){
       removedItem = "Please provide the proper list item number.";
     }
     else{
       try{
-         removedItem = term.todoList.remove(index);
+         node = term.todoList.remove(index);
+	 removedItem = node.item;
 	 PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(term.FILE_NAME)));
-	 Iterator<String> listIterator = term.todoList.iterator();
+	 Iterator<TerminalToDo> listIterator = term.todoList.iterator();
 	 while(listIterator.hasNext()){
            out.println(listIterator.next());
         }
@@ -119,12 +132,15 @@ public class TerminalToDo {
 
     System.out.println("TerminalToDo: Commandline based to-do application(v 0.1.1)");
     System.out.println("Type 'help' to list all commands");
+    String defaultItem = "";
+    int defaultUrgency = 0;
 
     /*
      * Creating the TerminalToDo objects and the Scanner objects. These objects 
      * are used for all opperations.
      */
-    TerminalToDo term = new TerminalToDo();
+    TerminalToDo term = new TerminalToDo(defaultItem, defaultUrgency);
+    term.ListLoader();
     Scanner scn = new Scanner(System.in);
     File file = new File(term.FILE_NAME);
          
@@ -175,7 +191,7 @@ public class TerminalToDo {
 	term.listItems(term);
       }
       else if(input.equals("exit")){
-	System.out.println("Exiting...")
+	System.out.println("Exiting...");
 	break;
       }
       else{

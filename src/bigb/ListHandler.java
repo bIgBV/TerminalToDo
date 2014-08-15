@@ -1,9 +1,8 @@
-package com.bigb;
+package bigb;
 
 import java.io.*;
 import java.util.LinkedList;
 
-import com.bigb.TerminalToDo;
 
 
 public class ListHandler {
@@ -35,10 +34,24 @@ public class ListHandler {
      * a buffer for the input from the user.
      *
      * @param item a String containing the user input.
-    sho     */
+     * @param list the list to which the item needs to be added.
+     */
     public void addItem(String item, LinkedList<TerminalToDo> list){
         TerminalToDo node = new TerminalToDo(item);
         list.add(node);
+    }
+
+    /**
+     * Adds a new item to the beginning of a list if urgency is supplied. Will add functionality for
+     * ordering items by urgency.
+     *
+     * @param item a String containing the user input
+     * @param urgency integer which holds the urgency value
+     * @param list the list to which the item needs to be added.
+     */
+    public void addItem(String item, int urgency,LinkedList<TerminalToDo> list){
+        TerminalToDo node = new TerminalToDo(item, urgency);
+        list.addFirst(node);
     }
 
     /**

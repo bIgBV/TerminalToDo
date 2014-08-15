@@ -1,6 +1,6 @@
-import java.util.*;
+package bigb;
 
-import ListHandler;
+import java.util.*;
 
 
 /**
@@ -11,18 +11,23 @@ import ListHandler;
 public class TerminalToDo {
 
     // This variable stores the location for the list file.
-    public static final String FILE_NAME = "list.txt";
+    public static final String FILE_NAME = "src/bigb/list.txt";
 
-    LinkedList<TerminalToDo> todoList = new LinkedList<TerminalToDo>();
     String item;
+    int urgency;
 
     TerminalToDo(String item){
         this.item = item;
     }
 
+    TerminalToDo(String item, int urgency){
+        this.item = item;
+        this.urgency = urgency;
+    }
+
     public static void main(String args[]){
 
-        System.out.println("TerminalToDo.TerminalToDo: Commandline based to-do application(v 0.2.1)");
+        System.out.println("TerminalToDo: Commandline based to-do application(v 0.2.1)");
         System.out.println("Type 'help' to list all commands");
 
         ListHandler handler = new ListHandler();
@@ -36,15 +41,16 @@ public class TerminalToDo {
 
         while(true){
             System.out.print("> ");
-            String input = scn.nextLine().replaceAll("\\s+","");
+            String input = scn.nextLine();
+            //String input = scn.nextLine().replaceAll("\\s+","");
 
             // This part of the main method checks for user input.
             if(input.equals("help")){
-                System.out.println("Welcome to TerminalToDo.TerminalToDo, the command line to-do list.\nYou have three options:\n");
+                System.out.println("Welcome to bigb.TerminalToDo.bigb.TerminalToDo, the command line to-do list.\nYou have three options:\n");
                 System.out.format("%10s%s","add:", " This command let's you add a new item to the list.\n");
                 System.out.format("%10s%s","show:"," This command shows you all the items present in your list.\n");
-                System.out.format("%10s%s","delete:"," This command asks for an index and deletes the particular item at that index.\n");
-                System.out.format("%10s%s","exit:"," This command exits the application.\n");
+                System.out.format("%10s%s", "delete:", " This command asks for an index and deletes the particular item at that index.\n");
+                System.out.format("%10s%s", "exit:", " This command exits the application.\n");
             }
             else if(input.equals("add")){
                 System.out.print("New item: ");
@@ -53,9 +59,16 @@ public class TerminalToDo {
                     System.out.print("> Please enter a new list item");
                 }
                 else {
-                    handler.addItem(text, LIST);
-                    System.out.println("New item has been added...");
-                    handler.listItems(LIST);
+                     if(text.contains(":")){
+                        int urgencyIndex = text.indexOf(":");
+                        int urgency = Integer.parseInt(text.substring(urgencyIndex, text.length()).replaceAll("\\s+", ""));
+                        handler.addItem(text, urgency, LIST);
+                    }
+                    else {
+                         handler.addItem(text, LIST);
+                         System.out.println("New item has been added...");
+                         handler.listItems(LIST);
+                     }
                 }
             }
             else if(input.equals("show")){

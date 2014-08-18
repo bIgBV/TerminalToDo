@@ -11,7 +11,7 @@ import java.util.*;
 public class TerminalToDo {
 
     // This variable stores the location for the list file.
-    public static final String FILE_NAME = "src/bigb/list.txt";
+    public static final String FILE_NAME = "list.txt";
 
     String item;
     int urgency;
@@ -25,6 +25,23 @@ public class TerminalToDo {
         this.urgency = urgency;
     }
 
+    /**
+    * Lists all the items present in the list. Takes in the input file and lists all the
+    * items present in it by reading each line.
+    */
+    public static void listItems(LinkedList<TerminalToDo> list){
+
+        // This uses a generic collection to avoid a ClassCastException when extracting list
+        // items.
+        int itemNumber = 1;
+        for(TerminalToDo item : list){
+            System.out.format("%5d%s%s%s",itemNumber , ": " , item.item,"\n");
+            itemNumber++;
+        }
+    }
+
+
+
     public static void main(String args[]){
 
         System.out.println("TerminalToDo: Commandline based to-do application(v 0.2.1)");
@@ -34,7 +51,7 @@ public class TerminalToDo {
 
 
         // Loading list into memory
-        LinkedList<TerminalToDo> LIST = handler.listLoader(FILE_NAME);
+        LinkedList<TerminalToDo> LIST = handler.LoadList(FILE_NAME);
 
         // Setting up scanner to take user input.
         Scanner scn = new Scanner(System.in);
@@ -60,24 +77,24 @@ public class TerminalToDo {
                 }
                 else {
                      if(text.contains(":")){
-                        int urgencyIndex = text.indexOf(":");
+                        int urgencyIndex = text.indexOf(":") + 1;
                         int urgency = Integer.parseInt(text.substring(urgencyIndex, text.length()).replaceAll("\\s+", ""));
                         handler.addItem(text, urgency, LIST);
                     }
                     else {
                          handler.addItem(text, LIST);
                          System.out.println("New item has been added...");
-                         handler.listItems(LIST);
+                         TerminalToDo.listItems(LIST);
                      }
                 }
             }
             else if(input.equals("show")){
                 System.out.println("Listing all present items:");
-                handler.listItems(LIST);
+                TerminalToDo.listItems(LIST);
             }
             else if(input.equals("delete")){
                 System.out.println("Listing present items in list...");
-                handler.listItems(LIST);
+                TerminalToDo.listItems(LIST);
                 System.out.println("Please specify which item you want to remove: ");
                 int index = Integer.parseInt(scn.next()) - 1;
                 if(index > LIST.size() || index <= 0){
@@ -88,12 +105,12 @@ public class TerminalToDo {
                     System.out.println("The removed item is: ");
                     System.out.println(removedItem);
                     System.out.println("The new list items are: ");
-                    handler.listItems(LIST);
+                    TerminalToDo.listItems(LIST);
                 }
             }
             else if(input.equals("exit")){
                 System.out.println("Exiting...");
-                handler.exitProgram(FILE_NAME, LIST);
+                handler.saveProgram(FILE_NAME, LIST);
                 break;
             }
             else{

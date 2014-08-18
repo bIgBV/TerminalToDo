@@ -6,16 +6,12 @@ import java.util.LinkedList;
 
 
 public class ListHandler {
-
-
-
-
-    LinkedList listLoader(String FILE_NAME){
-        System.out.println(">Loading your list items...");
+    public LinkedList LoadList(String FILE_NAME){
+        System.out.println(">Loading your list items from " + FILE_NAME + "...");
 
         LinkedList<TerminalToDo> list = new LinkedList<TerminalToDo>();
-        try{
-            BufferedReader read = new BufferedReader( new FileReader(FILE_NAME));
+
+        try(BufferedReader read = new BufferedReader( new FileReader(FILE_NAME))){
             String line;
             while((line = read.readLine()) != null){
                 TerminalToDo node = new TerminalToDo(line);
@@ -55,21 +51,6 @@ public class ListHandler {
     }
 
     /**
-     * Lists all the items present in the list. Takes in the input file and lists all the
-     * items present in it by reading each line.
-     */
-    public void listItems(LinkedList<TerminalToDo> list){
-
-        // This uses a generic collection to avoid a ClassCastException when extracting list
-        // items.
-        int itemNumber = 1;
-        for(TerminalToDo item : list){
-            System.out.format("%5d%s%s%s",itemNumber , ": " , item.item,"\n");
-            itemNumber++;
-        }
-    }
-
-    /**
      * Deletes an item from the list and updates the file. It deletes the item from the list
      * using the <code>remove(int index)</code> method of {@link LinkedList} and then
      * iterates over the list and overwrites the file with the new list.
@@ -82,9 +63,8 @@ public class ListHandler {
         return removedItem;
     }
 
-    public void exitProgram(String FILE_NAME, LinkedList<TerminalToDo> list) {
-        try {
-            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_NAME)));
+    public void saveProgram(String FILE_NAME, LinkedList<TerminalToDo> list) {
+        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_NAME)))) {
             for (TerminalToDo o : list) {
                 out.println(o.item);
             }
